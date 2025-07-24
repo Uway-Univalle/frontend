@@ -1,14 +1,37 @@
 import { useState } from 'react';
-import {View,Text,Image,TextInput,TouchableOpacity,StyleSheet,SafeAreaView} from 'react-native';
+import api from '../api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {View,Text,Image,TextInput,TouchableOpacity,StyleSheet} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function LoginScreen({ navigation }) {
     
-    const [email, setEmail] = useState('')
+    const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [secure, setSecure] = useState(true)
     const iconUguee = require('../assets/Uguee.png')
+    const handleLogin = async () => {
+
+    try {
+      const response = await api.post('/api/login/', {
+        username,
+        password,
+      });
+      // Maneja la respuesta del backend
+      if (response.data.access) {
+        // Navega a la pantalla principal y guarda el token
+        await AsyncStorage.setItem('token', response.data.access);
+        navigation.navigate('Inicio');
+        
+      } else {
+        alert('Credenciales incorrectas');
+      }
+    } catch (error) {
+      console.error('Error de conexión:', error.response.data);
+      alert('Error de conexión');
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -16,14 +39,14 @@ export default function LoginScreen({ navigation }) {
       <View style={{ width: '80%', alignItems: 'flex-start' }}>
       <Text style={styles.text}>¡Bienvenid@!</Text>
       <Text style={styles.subtitle}>Tu app de transporte de confianza</Text>
-      <Text style={styles.label}>Correo Institucional</Text>
+      <Text style={styles.label}>Usuario</Text>
       <View style={styles.inputContainer}>
       <TextInput
         style={[styles.input, { flex: 1 }]}
-        placeholder="example@email.com"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
+        placeholder="Username o Email"
+        value={username}
+        onChangeText={setUsername}
+        keyboardType="default"
         autoCapitalize="none" /></View>
       <Text style={styles.label}>Contraseña</Text>
       <View style={styles.inputContainer}>
@@ -43,7 +66,7 @@ export default function LoginScreen({ navigation }) {
       </View>
       </View>
       
-      <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+      <TouchableOpacity onPress={handleLogin}>
         <LinearGradient
                 colors={['#340378ff', '#6723c6ff']}
                 start={{ x: 0, y: 0 }}
