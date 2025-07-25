@@ -4,6 +4,10 @@ import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 
+import * as DocumentPicker from 'expo-document-picker'; 
+
+
+
 export default function ConductorScreen() {
   const navigation = useNavigation();
 
@@ -14,6 +18,24 @@ export default function ConductorScreen() {
   const [contrasena, setContrasena] = useState('');
   const [tipoUsuario, setTipoUsuario] = useState('');
 
+  const handlePickDocument = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: "*/*", // puedes especificar tipos específicos como "application/pdf"
+        copyToCacheDirectory: true,
+        multiple: false,
+      });
+
+
+      if (result.type === "success") {
+        alert(`Archivo seleccionado:\n${result.name}`);
+        // Puedes guardar result.uri o enviarlo a una API
+      }
+    } catch (err) {
+      console.log("Error al seleccionar archivo:", err);
+    }
+  };
+  
   return (
     <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
       <TouchableOpacity style={styles.circleButton} onPress={() => navigation.navigate('Inicio')}>
@@ -79,6 +101,12 @@ export default function ConductorScreen() {
         </Picker>
       </View>
 
+
+      <TouchableOpacity style={styles.uploadButton} onPress={handlePickDocument}>
+        <Text style={styles.uploadButtonText}>Subir archivo adjunto</Text>
+      </TouchableOpacity>
+      
+
       <TouchableOpacity style={styles.registerButton} onPress={() => {/* Acción al registrarse */}}>
         <Text style={styles.registerButtonText}>Registrarse</Text>
       </TouchableOpacity>
@@ -86,9 +114,12 @@ export default function ConductorScreen() {
       <TouchableOpacity style={styles.loginLink} onPress={() => navigation.navigate('Login')}>
         <Text style={styles.loginLinkText}>Tengo una cuenta</Text>
       </TouchableOpacity>
- 
+
 
     </ScrollView>
+
+
+
   );
 
 
@@ -177,6 +208,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 20,
     alignSelf: 'center',
+
   },
 
   registerButtonText: {
@@ -184,6 +216,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
+
   loginLink: {
     width: 137,
     height: 33,
@@ -200,5 +233,20 @@ const styles = StyleSheet.create({
    textDecorationLine: 'none',
 },
 
+  uploadButton: {
+    backgroundColor: '#FFFFFF',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginBottom: 20,
+},
+  uploadButtonText: {
+    color: '#1A0A1F',
+    fontSize: 16,
+    fontWeight: 'bold',
+},
+
+
 
 });
+
