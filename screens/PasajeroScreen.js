@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 
-export default function ConductorScreen() {
+export default function PasajeroScreen() {
   const navigation = useNavigation();
 
   const [nombre, setNombre] = useState('');
@@ -20,7 +20,7 @@ export default function ConductorScreen() {
         <Ionicons name="arrow-back" size={24} color="#1A0A1F" />
       </TouchableOpacity>
 
-      <Text style={styles.title}>Rutas Disponibles</Text>
+      <Text style={styles.title}>Ingresa tus datos</Text>
 
       <TextInput
         style={styles.input}
