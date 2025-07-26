@@ -102,7 +102,7 @@ export default function PasajeroScreen() {
         <Ionicons name="arrow-back" size={24} color="#1A0A1F" />
       </TouchableOpacity>
 
-      <Text style={styles.title}>Rutas Disponibles</Text>
+      <Text style={styles.title}>Ingresa tus datos</Text>
 
       <TextInput
         style={styles.input}
