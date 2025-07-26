@@ -8,7 +8,9 @@ export default function HomeScreen() {
   const [points, setPoints] = useState([]);
   const [drawing, setDrawing] = useState(false);
   const [location, setLocation] = useState(null);
+
   const [shouldFollow, setShouldFollow] = useState(true); // controla el seguimiento
+
   const mapRef = useRef(null);
 
   useEffect(() => {
@@ -45,6 +47,7 @@ export default function HomeScreen() {
 
   const handleFollowMe = () => {
     setShouldFollow(true); // botón para volver a seguir tu ubicación
+
   };
 
   return (
@@ -52,8 +55,10 @@ export default function HomeScreen() {
       <MapView
         ref={mapRef}
         style={{ flex: 1 }}
+
         onPanDrag={handleMapTouch}
         onPress={handleMapTouch}
+
         initialRegion={{
           latitude: location?.latitude || 19.4326,
           longitude: location?.longitude || -99.1332,
@@ -66,8 +71,10 @@ export default function HomeScreen() {
             key={idx}
             coordinate={point}
             onPress={(e) => {
+
               e.stopPropagation && e.stopPropagation();
               setPoints(points.filter((_, i) => i !== idx));
+
             }}
           />
         ))}
@@ -75,6 +82,7 @@ export default function HomeScreen() {
           <Polyline coordinates={points} strokeColor="#340378" strokeWidth={4} />
         )}
       </MapView>
+
 
       <Button title="Iniciar ruta" onPress={() => setDrawing(true)} />
       <Button title="Guardar ruta" onPress={() => {
