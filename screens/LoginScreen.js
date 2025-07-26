@@ -80,7 +80,7 @@ export default function LoginScreen({ navigation }) {
         <Text style={styles.forgot}>¿Olvidaste tu contraseña?</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.navigate('Inicio')}>
+      <TouchableOpacity onPress={() => navigation.navigate('Home')}>
         <Text style={styles.back}>Volver al inicio</Text>
       </TouchableOpacity>
     </View>
