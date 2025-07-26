@@ -1,96 +1,118 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, Image, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
-import { Picker } from '@react-native-picker/picker';
+import { Ionicons, Feather } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
+import { FlatList } from 'react-native';
+
 
 export default function ConductorScreen() {
   const navigation = useNavigation();
 
-  const [nombre, setNombre] = useState('');
-  const [apellido, setApellido] = useState('');
-  const [documento, setDocumento] = useState('');
-  const [correo, setCorreo] = useState('');
   const [contrasena, setContrasena] = useState('');
-  const [tipoUsuario, setTipoUsuario] = useState('');
+  const [image, setImage] = useState(null);
+  const rutas = [
+    {
+      id: '1',
+      nombre: 'Japeto',
+      calificacion: 4.5,
+      hora: '10:00pm',
+      ruta: 'Melendez - Vergel',
+      imagen: 'https://i.imgur.com/0y8Ftya.png',
+    },
+    {
+      id: '2',
+      nombre: 'Japeto',
+      calificacion: 4.5,
+      hora: '10:00pm',
+      ruta: 'Melendez - Vergel',
+      imagen: 'https://i.imgur.com/0y8Ftya.png',
+    },
+    {
+      id: '3',
+      nombre: 'Japeto',
+      calificacion: 4.5,
+      hora: '10:00pm',
+      ruta: 'Melendez - Vergel',
+      imagen: 'https://i.imgur.com/0y8Ftya.png',
+    },
+    {
+      id: '4',
+      nombre: 'Japeto',
+      calificacion: 4.5,
+      hora: '10:00pm',
+      ruta: 'Melendez - Vergel',
+      imagen: 'https://i.imgur.com/0y8Ftya.png',
+    },
+];
+  const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      alert('Se necesita permiso para acceder a la galería');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+      allowsEditing: true,
+    });
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
+  };
 
   return (
-    <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+
+  <View style={{ flex: 1 }}>
+    <View style={styles.container}>
       <TouchableOpacity style={styles.circleButton} onPress={() => navigation.navigate('Inicio')}>
         <Ionicons name="arrow-back" size={24} color="#1A0A1F" />
       </TouchableOpacity>
 
       <Text style={styles.title}>Rutas Disponibles</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Nombre"
-        placeholderTextColor="#aaa"
-        value={nombre}
-        onChangeText={setNombre}
+      <FlatList
+        data={rutas}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={{ paddingBottom: 120 }}
+        renderItem={({ item }) => (
+          <View style={styles.card}>
+            <View style={styles.cardLeft}>
+              <Text style={styles.nombre}>
+                {item.nombre} <Text style={styles.rating}>{item.calificacion} ★</Text>
+              </Text>
+              <Text style={styles.hora}>
+                {item.hora} - {item.ruta}
+              </Text>
+              <TouchableOpacity style={styles.verRuta}>
+                <Text style={styles.verRutaText}>Ver ruta</Text>
+              </TouchableOpacity>
+            </View>
+            <Image source={{ uri: item.imagen }} style={styles.avatar} />
+          </View>
+        )}
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Apellido"
-        placeholderTextColor="#aaa"
-        value={apellido}
-        onChangeText={setApellido}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Documento"
-        placeholderTextColor="#aaa"
-        keyboardType="numeric"
-        value={documento}
-        onChangeText={setDocumento}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Correo Electrónico"
-        placeholderTextColor="#aaa"
-        keyboardType="email-address"
-        value={correo}
-        onChangeText={setCorreo}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Contraseña"
-        placeholderTextColor="#aaa"
-        secureTextEntry
-        value={contrasena}
-        onChangeText={setContrasena}
-      />
+    </View>
 
-      <Text style={styles.label}>¿Qué eres?</Text>
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={tipoUsuario}
-          onValueChange={(itemValue) => setTipoUsuario(itemValue)}
-          style={Platform.select({
-            ios: styles.pickerIOS,
-            android: styles.pickerAndroid,
-          })}
-          dropdownIconColor="#1A0A1F"
-        >
-          <Picker.Item label="Selecciona una opción..." value="" />
-          <Picker.Item label="Estudiante" value="Estudiante" />
-          <Picker.Item label="Profesor" value="Profesor" />
-          <Picker.Item label="Administrativo" value="Administrativo" />
-        </Picker>
-      </View>
+    {image && <Image source={{ uri: image }} style={styles.imagePreview} />}
 
-      <TouchableOpacity style={styles.registerButton} onPress={() => {/* Acción al registrarse */}}>
-        <Text style={styles.registerButtonText}>Registrarse</Text>
+    <TouchableOpacity style={styles.button} onPress={pickImage}>
+      <Text style={styles.buttonText}>Subir imagen</Text>
+    </TouchableOpacity>
+
+    {/* Botón flotante único */}
+    <View style={styles.floatingButtons}>
+      <TouchableOpacity style={styles.iconButton}>
+        <Feather name="search" size={24} color="#000" />
       </TouchableOpacity>
-
-      <TouchableOpacity style={styles.loginLink} onPress={() => navigation.navigate('Login')}>
-        <Text style={styles.loginLinkText}>Tengo una cuenta</Text>
+      <TouchableOpacity style={styles.iconButton}>
+        <Feather name="filter" size={24} color="#000" />
       </TouchableOpacity>
- 
-
-    </ScrollView>
-  );
-
+    </View>
+  </View>
+);
 
 }
 
@@ -100,6 +122,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#1A0A1F',
     padding: 20,
     paddingTop: 80,
+    paddingBottom: 100, // espacio para botón flotante
   },
   circleButton: {
     width: 40,
@@ -132,30 +155,6 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     fontSize: 16,
   },
-  label: {
-    color: 'white',
-    marginBottom: 8,
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  pickerContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    marginBottom: 20,
-    overflow: 'hidden',
-    borderWidth: Platform.OS === 'ios' ? 1 : 0,
-    borderColor: '#ccc',
-  },
-  pickerAndroid: {
-    height: 50,
-    width: '100%',
-    color: '#000',
-  },
-  pickerIOS: {
-    height: 200,
-    width: '100%',
-    color: '#000',
-  },
   button: {
     backgroundColor: '#FFFFFF',
     padding: 15,
@@ -168,37 +167,91 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
-  registerButton: {
-    backgroundColor: '#6864D9',
+  imagePreview: {
     width: '100%',
-    height: 58,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 20,
-    alignSelf: 'center',
-  },
-
-  registerButtonText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: 'bold',
+    height: 200,
+    resizeMode: 'contain',
+    marginTop: 10,
+    marginBottom: 10,
+    borderRadius: 10,
   },
   loginLink: {
-    width: 137,
-    height: 33,
     alignItems: 'center',
     justifyContent: 'center',
     alignSelf: 'center',
-    marginTop: 10,
-},
-
+    marginTop: 15,
+  },
   loginLinkText: {
-   color: '#0167FF',
-   fontSize: 14,
-   fontWeight: 'bold',
-   textDecorationLine: 'none',
+    color: '#0167FF',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  floatingButtons: {
+    position: 'absolute',
+    bottom: 25,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    backgroundColor: '#000',
+    padding: 10,
+    borderRadius: 40,
+    marginHorizontal: '25%',
+    gap: 20,
+  },
+  iconButton: {
+    backgroundColor: '#fff',
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  card: {
+  backgroundColor: '#fff',
+  borderRadius: 15,
+  padding: 15,
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginBottom: 15,
+  borderWidth: 1,
+  borderColor: '#000',
 },
 
+  cardLeft: {
+    flex: 1,
+    paddingRight: 10,
+},
+  nombre: {
+    fontWeight: 'bold',
+    fontSize: 16,
+    marginBottom: 4,
+},
+  rating: {
+    color: '#0167FF',
+  },
+  hora: {
+    color: '#333',
+    marginBottom: 8,
+},
+  verRuta: {
+    backgroundColor: '#0167FF',
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+    alignSelf: 'flex-start',
+},
+  verRutaText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 12,
+},
+  avatar: {
+    width: 55,
+    height: 55,
+    borderRadius: 30,
+},
 
 });
