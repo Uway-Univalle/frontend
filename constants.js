@@ -1,6 +1,4 @@
 export const USER_TYPES = {
-    SYSTEM_ADMIN: 1,
-    COLLEGE_ADMIN: 2,
     DRIVER: 3,
     PASSENGER: 4,
 };
