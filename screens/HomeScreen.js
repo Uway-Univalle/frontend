@@ -47,6 +47,7 @@ export default function HomeScreen() {
 
   const handleFollowMe = () => {
     setShouldFollow(true); // botón para volver a seguir tu ubicación
+
   };
 
   return (
