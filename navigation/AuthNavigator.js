@@ -7,6 +7,8 @@ import ConductorScreen from '../screens/ConductorScreen';
 import PasajeroScreen from '../screens/PasajeroScreen';
 import LoginScreen from '../screens/LoginScreen';
 import HomeScreen from '../screens/HomeScreen';
+import MyVehiclesScreen from '../screens/MyVehiclesScreen';
+import RegisterVehicles from '../screens/RegisterVehicles';
 
 const Stack = createNativeStackNavigator();
 
