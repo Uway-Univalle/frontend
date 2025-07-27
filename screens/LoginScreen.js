@@ -4,8 +4,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { View, Text, Image, TextInput, TouchableOpacity, StyleSheet, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import { USER_TYPES } from '../constants';
 
-export default function LoginScreen({ navigation }) {
+export default function LoginScreen({ navigation, setUserType }) {
 
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -23,12 +24,14 @@ export default function LoginScreen({ navigation }) {
         username,
         password,
       });
-      // Maneja la respuesta del backend
-      if (response.data.access) {
-        // Navega a la pantalla principal y guarda el token
-        await AsyncStorage.setItem('token', response.data.access);
-        navigation.navigate('Inicio');
 
+      if (response.data.access && Object.values(USER_TYPES).includes(response.data.user.user_type)) {
+    
+        await AsyncStorage.setItem('token', response.data.access);
+        const userType = response.data.user.user_type.toString();
+        await AsyncStorage.setItem('user_type', userType);
+        setUserType(userType);
+        
       } else {
         alert('Credenciales incorrectas');
       }
@@ -86,7 +89,7 @@ export default function LoginScreen({ navigation }) {
           <Text style={styles.forgot}>¿Olvidaste tu contraseña?</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+        <TouchableOpacity onPress={() => navigation.navigate('Inicio')}>
           <Text style={styles.back}>Volver al inicio</Text>
         </TouchableOpacity>
       </View>
