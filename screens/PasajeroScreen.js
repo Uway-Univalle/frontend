@@ -98,9 +98,6 @@ export default function ConductorScreen() {
 
     {image && <Image source={{ uri: image }} style={styles.imagePreview} />}
 
-    <TouchableOpacity style={styles.button} onPress={pickImage}>
-      <Text style={styles.buttonText}>Subir imagen</Text>
-    </TouchableOpacity>
 
     {/* Botón flotante único */}
     <View style={styles.floatingButtons}>
