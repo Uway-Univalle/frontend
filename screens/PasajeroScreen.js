@@ -31,7 +31,7 @@ export default function PasajeroScreen() {
       alert('Por favor completa todos los campos.');
       return;
     }
-    if (!esEmailValido(correo)) {
+    if (!isValidEmail(correo)) {
       alert('Por favor ingresa un correo electrónico válido.');
       return;
     }

@@ -6,10 +6,9 @@ import * as ImagePicker from 'expo-image-picker';
 import { FlatList } from 'react-native';
 
 
-export default function ConductorScreen() {
+export default function PasajeroTripsScreen() {
   const navigation = useNavigation();
 
-  const [contrasena, setContrasena] = useState('');
   const [image, setImage] = useState(null);
   const rutas = [
     {
@@ -44,7 +43,7 @@ export default function ConductorScreen() {
       ruta: 'Melendez - Vergel',
       imagen: 'https://i.imgur.com/0y8Ftya.png',
     },
-];
+  ];
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
@@ -65,54 +64,54 @@ export default function ConductorScreen() {
 
   return (
 
-  <View style={{ flex: 1 }}>
-    <View style={styles.container}>
-      <TouchableOpacity style={styles.circleButton} onPress={() => navigation.navigate('Inicio')}>
-        <Ionicons name="arrow-back" size={24} color="#1A0A1F" />
-      </TouchableOpacity>
+    <View style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <TouchableOpacity style={styles.circleButton} onPress={() => navigation.navigate('Inicio')}>
+          <Ionicons name="arrow-back" size={24} color="#1A0A1F" />
+        </TouchableOpacity>
 
-      <Text style={styles.title}>Rutas Disponibles</Text>
+        <Text style={styles.title}>Rutas Disponibles</Text>
 
-      <FlatList
-        data={rutas}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={{ paddingBottom: 120 }}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <View style={styles.cardLeft}>
-              <Text style={styles.nombre}>
-                {item.nombre} <Text style={styles.rating}>{item.calificacion} ★</Text>
-              </Text>
-              <Text style={styles.hora}>
-                {item.hora} - {item.ruta}
-              </Text>
-              <TouchableOpacity style={styles.verRuta}>
-                <Text style={styles.verRutaText}>Ver ruta</Text>
-              </TouchableOpacity>
+        <FlatList
+          data={rutas}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={{ paddingBottom: 120 }}
+          renderItem={({ item }) => (
+            <View style={styles.card}>
+              <View style={styles.cardLeft}>
+                <Text style={styles.nombre}>
+                  {item.nombre} <Text style={styles.rating}>{item.calificacion} ★</Text>
+                </Text>
+                <Text style={styles.hora}>
+                  {item.hora} - {item.ruta}
+                </Text>
+                <TouchableOpacity style={styles.verRuta}>
+                  <Text style={styles.verRutaText}>Ver ruta</Text>
+                </TouchableOpacity>
+              </View>
+              <Image source={{ uri: item.imagen }} style={styles.avatar} />
             </View>
-            <Image source={{ uri: item.imagen }} style={styles.avatar} />
-          </View>
-        )}
-      />
-    </View>
+          )}
+        />
+      </View>
 
-    {image && <Image source={{ uri: image }} style={styles.imagePreview} />}
+      {image && <Image source={{ uri: image }} style={styles.imagePreview} />}
 
-    <TouchableOpacity style={styles.button} onPress={pickImage}>
-      <Text style={styles.buttonText}>Subir imagen</Text>
-    </TouchableOpacity>
-
-    {/* Botón flotante único */}
-    <View style={styles.floatingButtons}>
-      <TouchableOpacity style={styles.iconButton}>
-        <Feather name="search" size={24} color="#000" />
+      <TouchableOpacity style={styles.button} onPress={pickImage}>
+        <Text style={styles.buttonText}>Subir imagen</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.iconButton}>
-        <Feather name="filter" size={24} color="#000" />
-      </TouchableOpacity>
+
+      {/* Botón flotante único */}
+      <View style={styles.floatingButtons}>
+        <TouchableOpacity style={styles.iconButton}>
+          <Feather name="search" size={24} color="#000" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.iconButton}>
+          <Feather name="filter" size={24} color="#000" />
+        </TouchableOpacity>
+      </View>
     </View>
-  </View>
-);
+  );
 
 }
 
@@ -209,51 +208,49 @@ const styles = StyleSheet.create({
   },
 
   card: {
-  backgroundColor: '#fff',
-  borderRadius: 15,
-  padding: 15,
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  marginBottom: 15,
-  borderWidth: 1,
-  borderColor: '#000',
-},
+    backgroundColor: '#fff',
+    borderRadius: 15,
+    padding: 15,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: '#000',
+  },
 
   cardLeft: {
     flex: 1,
     paddingRight: 10,
-},
+  },
   nombre: {
     fontWeight: 'bold',
     fontSize: 16,
     marginBottom: 4,
-},
+  },
   rating: {
     color: '#0167FF',
   },
   hora: {
     color: '#333',
     marginBottom: 8,
-},
+  },
   verRuta: {
     backgroundColor: '#0167FF',
     paddingVertical: 6,
     paddingHorizontal: 10,
     borderRadius: 5,
     alignSelf: 'flex-start',
-},
+  },
   verRutaText: {
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 12,
-},
+  },
   avatar: {
     width: 55,
     height: 55,
     borderRadius: 30,
-},
+  },
 
 });
-
-
