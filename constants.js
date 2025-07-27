@@ -8,3 +8,18 @@ export const PASSENGER_TYPES = {
     PROFESSOR: 2,
     STAFF: 3,
 };
+
+export const VEHICLE_TYPES = {
+    VAN: 1,
+    BIKE: 2,
+    BUS: 3,
+    CAR: 4,
+    SKATEBOARD: 5,
+    TRYCICLE: 6,
+};
+
+export const VEHICLE_CATEGORIES = {
+    METROPOLITAN: 1,
+    CAMPUS: 2,
+    INTERMUNICIPAL: 3,
+};
