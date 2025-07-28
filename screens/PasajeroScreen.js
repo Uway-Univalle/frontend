@@ -12,6 +12,7 @@ export default function PasajeroScreen() {
 
   const [nombre, setNombre] = useState('');
   const [apellido, setApellido] = useState('');
+  const [username, setUsername] = useState('');
   const [documento, setDocumento] = useState('');
   const [correo, setCorreo] = useState('');
   const [contrasena, setContrasena] = useState('');
@@ -27,7 +28,7 @@ export default function PasajeroScreen() {
   };
 
   const handleRegister = async () => {
-    if (!nombre || !apellido || !documento || !correo || !contrasena || !direccion || !telefono || !selectedCollege || !tipoPasajero) {
+    if (!nombre || !apellido || !username || !documento || !correo || !contrasena || !direccion || !telefono || !selectedCollege || !tipoPasajero) {
       alert('Por favor completa todos los campos.');
       return;
     }
@@ -38,7 +39,9 @@ export default function PasajeroScreen() {
 
     try {
       const response = await api.post('/api/users/', {
-        username: `${nombre}${apellido}`,
+        first_name: nombre,
+        last_name: apellido,
+        username: username,
         email: correo,
         personal_id: documento,
         address: direccion,
@@ -117,6 +120,13 @@ export default function PasajeroScreen() {
         placeholderTextColor="#aaa"
         value={apellido}
         onChangeText={setApellido}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Username"
+        placeholderTextColor="#aaa"
+        value={username}
+        onChangeText={setUsername}
       />
       <TextInput
         style={styles.input}

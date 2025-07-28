@@ -26,6 +26,7 @@ export default function ConductorHomeScreen() {
   const [shouldFollow, setShouldFollow] = useState(true); // controla el seguimiento
   const [optimizedRoute, setOptimizedRoute] = useState([]);
   const [savedRouteId, setSavedRouteId] = useState(null);
+  const [coordinates, setCoordinates] = useState([])
 
   const mapRef = useRef(null);
 
@@ -68,12 +69,13 @@ export default function ConductorHomeScreen() {
       return;
     }
 
-    const coordinates = points.map(p => [p.latitude, p.longitude]);
+    const coords = points.map(p => [p.latitude, p.longitude]);
+    setCoordinates(coords);
 
     try {
       const token = await AsyncStorage.getItem('token');
       const response = await api.post('/api/routes/full-route/',
-        { coordinates },
+        { coordinates: coords },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -241,7 +243,6 @@ export default function ConductorHomeScreen() {
 
                   try {
                     const token = await AsyncStorage.getItem('token');
-                    const coordinates = optimizedRoute.map(p => [p.longitude, p.latitude]);
 
                     const response = await api.post(
                       '/api/routes/',
