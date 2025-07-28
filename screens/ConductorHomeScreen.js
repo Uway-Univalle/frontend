@@ -1,5 +1,6 @@
 import MapView, { Marker, Polyline } from 'react-native-maps';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { View, Button, TouchableOpacity, StyleSheet, Modal, Text, Platform, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -14,17 +15,24 @@ export default function ConductorHomeScreen() {
   const [location, setLocation] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [showRouteForm, setShowRouteForm] = useState(false);
-  const [startTime, setStartTime] = useState(new Date());
   const [selectedVehicle, setSelectedVehicle] = useState(null);
-  const [showDatePicker, setShowDatePicker] = useState(false);
   const [userVehicles, setUserVehicles] = useState([]);
   const [routeName, setRouteName] = useState('');
   const [showScheduleTripPrompt, setShowScheduleTripPrompt] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [dateMode, setDateMode] = useState('date');
+  const [startTime, setStartTime] = useState(new Date());
 
   const [shouldFollow, setShouldFollow] = useState(true); // controla el seguimiento
   const [optimizedRoute, setOptimizedRoute] = useState([]);
+  const [savedRouteId, setSavedRouteId] = useState(null);
 
   const mapRef = useRef(null);
+
+  const openPicker = (mode) => {
+    setDateMode(mode);
+    setShowDatePicker(true);
+  };
 
   useEffect(() => {
     (async () => {
@@ -77,12 +85,9 @@ export default function ConductorHomeScreen() {
         latitude: lat,
         longitude: lon,
       }));
-      const duration = geoJson.duration;
 
       setOptimizedRoute(lineCoords);
       setDrawing(false);
-
-      // Aqui se debe guardar la ruta en el back y 
 
     } catch (error) {
       console.error('Error obteniendo ruta:', error.response?.data || error.message);
@@ -90,23 +95,32 @@ export default function ConductorHomeScreen() {
     }
   };
 
-  useEffect(() => {
-    const fetchVehicles = async () => {
-      try {
-        const token = await AsyncStorage.getItem('token');
-        const response = await api.get('/api/vehicles/', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setUserVehicles(response.data); // Ajusta si tu API devuelve los datos en otra propiedad
-      } catch (err) {
-        console.error('Error al cargar vehículos:', err.message);
-      }
-    };
+  useFocusEffect(
+    useCallback(() => {
+      const fetchVehicles = async () => {
+        try {
+          const token = await AsyncStorage.getItem('token');
+          if (!token) {
+            console.warn('Token no encontrado');
+            return;
+          }
 
-    fetchVehicles();
-  }, []);
+          const response = await api.get('/api/vehicles/', {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+
+          const verifiedVehicles = response.data.filter(v => v.is_verified === true);
+          setUserVehicles(verifiedVehicles);
+        } catch (error) {
+          console.error('Error fetching vehicles:', error);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchVehicles();
+    }, [])
+  );
 
   const handleMapTouch = () => {
     setShouldFollow(false); // cuando el usuario toca el mapa, desactiva seguimiento
@@ -229,7 +243,7 @@ export default function ConductorHomeScreen() {
                     const token = await AsyncStorage.getItem('token');
                     const coordinates = optimizedRoute.map(p => [p.longitude, p.latitude]);
 
-                    await api.post(
+                    const response = await api.post(
                       '/api/routes/',
                       {
                         name: routeName,
@@ -242,11 +256,15 @@ export default function ConductorHomeScreen() {
                       }
                     );
 
+                    const routeId = response.data.id;
+
+                    console.log('Ruta guardada con ID:', routeId);
+
+                    setSavedRouteId(routeId);
+
                     alert('Ruta guardada con éxito');
                     setRouteName('');
                     setShowRouteForm(false);
-                    setPoints([]);
-                    setOptimizedRoute([]);
                     setShowScheduleTripPrompt(true);
                   } catch (err) {
                     console.error('Error guardando ruta:', err.response?.data || err.message);
@@ -269,7 +287,11 @@ export default function ConductorHomeScreen() {
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>¿Deseas programar un viaje con esta ruta?</Text>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }}>
-              <Button title="No, gracias" onPress={() => setShowScheduleTripPrompt(false)} />
+              <Button title="No, gracias" onPress={() => {
+                setShowScheduleTripPrompt(false);
+                setPoints([]);
+                setOptimizedRoute([]);
+              }} />
               <Button title="Sí, programar viaje" onPress={() => {
                 setShowScheduleTripPrompt(false);
                 setShowForm(true);
@@ -289,21 +311,27 @@ export default function ConductorHomeScreen() {
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Detalles del viaje</Text>
 
+            <Text style={styles.label}>Fecha de inicio:</Text>
+            <TouchableOpacity onPress={() => openPicker('date')} style={styles.inputBox}>
+              <Text>{startTime.toLocaleDateString()}</Text>
+            </TouchableOpacity>
+
             <Text style={styles.label}>Hora de inicio:</Text>
-            <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.inputBox}>
-              <Text>{startTime.toLocaleTimeString()}</Text>
+            <TouchableOpacity onPress={() => openPicker('time')} style={styles.inputBox}>
+              <Text>{startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
             </TouchableOpacity>
 
             {showDatePicker && (
               <DateTimePicker
                 value={startTime}
-                mode="time"
-                is24Hour={true}
+                mode={dateMode}
+                is24Hour={false}
                 display={Platform.OS === 'ios' ? 'spinner' : 'default'}
                 onChange={(event, selectedDate) => {
                   if (selectedDate) setStartTime(selectedDate);
                   setShowDatePicker(false);
                 }}
+                textColor='#000'
               />
             )}
 
@@ -312,25 +340,56 @@ export default function ConductorHomeScreen() {
               <Picker
                 selectedValue={selectedVehicle}
                 onValueChange={(itemValue) => setSelectedVehicle(itemValue)}
+                style={Platform.OS === 'ios' ? styles.pickerIOS : styles.pickerAndroid}
               >
-                <Picker.Item label="Seleccione un vehículo" value={null} />
+                <Picker.Item label="Seleccione un vehículo" value={null} color='#000' />
                 {userVehicles.map((v) => (
-                  <Picker.Item key={v.id} label={v.name} value={v.id} />
+                  <Picker.Item key={v.id} label={v.plate} value={v.id} color='#000' />
                 ))}
               </Picker>
             </View>
 
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }}>
-              <Button title="Cancelar" color="grey" onPress={() => setShowForm(false)} />
-              <Button title="Guardar viaje" onPress={() => {
-                // Aquí podrías enviar toda la info: ruta, hora, vehículo, etc.
-                console.log({
-                  route: optimizedRoute,
-                  vehicle: selectedVehicle,
-                  startTime
-                });
-                setShowForm(false);
+              <Button title="Cancelar" color="grey" onPress={() => {
+                setShowForm(false)
+                setPoints([]);
+                setOptimizedRoute([]);
               }} />
+              <Button
+                title="Guardar viaje"
+                onPress={async () => {
+                  try {
+                    const token = await AsyncStorage.getItem('token');
+
+                    if (!savedRouteId || !selectedVehicle || !startTime) {
+                      alert('Faltan datos para guardar el viaje.');
+                      return;
+                    }
+
+                    const payload = {
+                      date: startTime.toISOString(),
+                      route: savedRouteId,
+                      vehicle: selectedVehicle
+                    };
+
+                    const response = await api.post('/api/trips/', payload, {
+                      headers: {
+                        Authorization: `Bearer ${token}`,
+                      },
+                    });
+
+                    alert('Viaje programado exitosamente');
+                    setShowForm(false);
+                    setPoints([]);
+                    setOptimizedRoute([]);
+
+                    console.log('Viaje creado:', response.data);
+                  } catch (err) {
+                    console.error('Error guardando viaje:', err.response?.data || err.message);
+                    alert('Error al guardar el viaje');
+                  }
+                }}
+              />
             </View>
           </View>
         </View>
@@ -398,11 +457,24 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 6,
     marginTop: 5,
+    color: '#000'
   },
   pickerContainer: {
-    borderWidth: 1,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    marginBottom: 20,
+    overflow: 'hidden',
+    borderWidth: Platform.OS === 'ios' ? 1 : 0,
     borderColor: '#ccc',
-    borderRadius: 6,
-    marginTop: 5,
   },
+  pickerAndroid: {
+    height: 50,
+    width: '100%',
+    color: '#000',
+  },
+  pickerIOS: {
+    height: 200,
+    width: '100%',
+    color: '#000',
+  }
 });

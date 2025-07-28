@@ -1,15 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import api from '../api';
 import { VEHICLE_CATEGORIES, VEHICLE_TYPES } from '../constants';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
-export default function VehiculoScreen() {
-  const navigation = useNavigation();
+export default function RegisterVehicleScreen({ navigation }) {
 
   const [marca, setMarca] = useState('');
   const [color, setColor] = useState('');
@@ -21,24 +19,25 @@ export default function VehiculoScreen() {
   const [showTechPicker, setShowTechPicker] = useState(false);
   const [selectedType, setSelectedType] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [token, setToken] = useState('');
 
   const handleRegister = async () => {
-    if (!marca || !modelo || !color || !placa || !capacidad || !selectedType || !selectedCategory) {
+    if (!marca || !color || !placa || !capacidad || !selectedType || !selectedCategory) {
       alert('Por favor completa todos los campos.');
       return;
     }
 
     try {
+      const token = await AsyncStorage.getItem('token');
       const response = await api.post('/api/vehicles/', {
         brand: marca,
         color: color,
         plate: placa,
         capacity: parseInt(capacidad),
-        soat_valid_until: soatDate.toISOString().split('T')[0],
-        tech_valid_until: techDate.toISOString().split('T')[0],
+        soat_date: soatDate.toISOString().split('T')[0],
+        tecnicomecanica_date: techDate.toISOString().split('T')[0],
         vehicle_type: selectedType,
         vehicle_category: selectedCategory,
+        state: 'AVAILABLE'
       }, {
         headers: {
           Authorization: `Bearer ${token}`
@@ -47,23 +46,21 @@ export default function VehiculoScreen() {
         
       if (response.status === 201) {
         alert('Vehículo registrado exitosamente.');
-        navigation.navigate('Inicio');
+        navigation.navigate('Mis Vehiculos');
+      } else {
+        console.log('error registrando este vehiculo');
       }
     } catch (error) {
       console.error('Error al registrar el vehículo:', error.response?.data || error.message);
       alert('Hubo un error al registrar el vehículo.');
     }
   };
- [];
 
   return (
-    <SafeAreaView style={styles.container}>
     <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-      <TouchableOpacity style={styles.circleButton} onPress={() => navigation.goBack()}>
+      <TouchableOpacity style={styles.circleButton} onPress={() => navigation.navigate('Mis Vehiculos')}>
         <Ionicons name="arrow-back" size={24} color="#1A0A1F" />
       </TouchableOpacity>
-
-      <Text style={styles.title}>Registro de Vehículo</Text>
 
       <TextInput
         style={styles.input}
@@ -106,11 +103,12 @@ export default function VehiculoScreen() {
         <DateTimePicker
           value={soatDate}
           mode="date"
-          display="default"
+          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
           onChange={(event, date) => {
             setShowSoatPicker(false);
             if (date) setSoatDate(date);
           }}
+          backgroundColor='white'
         />
       )}
 
@@ -122,11 +120,12 @@ export default function VehiculoScreen() {
         <DateTimePicker
           value={techDate}
           mode="date"
-          display="default"
+          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
           onChange={(event, date) => {
             setShowTechPicker(false);
             if (date) setTechDate(date);
           }}
+          backgroundColor='white'
         />
       )}
 
@@ -169,14 +168,11 @@ export default function VehiculoScreen() {
             
         </Picker>
         </View>   
-        
-          
 
       <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
         <Text style={styles.registerButtonText}>Registrar Vehículo</Text>
       </TouchableOpacity>
     </ScrollView>
-    </SafeAreaView>
   );
 }
 
@@ -185,7 +181,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     backgroundColor: '#1A0A1F',
     padding: 20,
-    paddingTop: 80,
+    paddingTop: 55,
   },
   circleButton: {
     width: 40,
@@ -195,8 +191,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     position: 'absolute',
-    top: 75,
-    left: 30,
+    top: 5,
+    left: 20,
     zIndex: 1,
   },
   title: {
@@ -210,7 +206,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: 12,
-    marginBottom: 15,
+    marginBottom: 10,
     fontSize: 16,
   },
   label: {
