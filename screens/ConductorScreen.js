@@ -19,6 +19,7 @@ export default function ConductorScreen() {
   const [direccion, setDireccion] = useState('');
   const [telefono, setTelefono] = useState('');
   const [codigo, setCodigo] = useState('');
+  const [username, setUsername] = useState('');
   const [selectedCollege, setSelectedCollege] = useState(null);
   const [universidades, setUniversidades] = useState([]);
 
@@ -41,14 +42,16 @@ export default function ConductorScreen() {
   };
 
   const handleRegister = async () => {
-    if (!nombre || !apellido || !documento || !correo || !contrasena || !direccion || !telefono || !selectedCollege) {
+    if (!nombre || !apellido || !username || !documento || !correo || !contrasena || !direccion || !telefono || !selectedCollege) {
       alert('Por favor completa todos los campos.');
       return;
     }
 
     try {
       const response = await api.post('/api/users/', {
-        username: `${nombre}${apellido}`,
+        first_name: nombre,
+        last_name: apellido,
+        username: username,
         email: correo,
         personal_id: documento,
         address: direccion,
@@ -127,6 +130,13 @@ export default function ConductorScreen() {
         placeholderTextColor="#aaa"
         value={apellido}
         onChangeText={setApellido}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Username"
+        placeholderTextColor="#aaa"
+        value={username}
+        onChangeText={setUsername}
       />
       <TextInput
         style={styles.input}

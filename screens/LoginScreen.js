@@ -37,7 +37,6 @@ export default function LoginScreen({ navigation, setUserType }) {
       }
     } catch (error) {
       console.error('Error de conexión:', error.response.data);
-      alert('Error de conexión');
     }
   };
 
