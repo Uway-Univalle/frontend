@@ -15,7 +15,6 @@ export default function RootNavigator() {
     const checkUser = async () => {
       const token = await AsyncStorage.getItem('token');
       const user_type = await AsyncStorage.getItem('user_type');
-      console.log(user_type);
       if (token && user_type) {
         setUserType(user_type);
       }

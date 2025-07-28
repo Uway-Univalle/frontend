@@ -1,9 +1,10 @@
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
 import { Ionicons } from '@expo/vector-icons';
 import ConductorHomeScreen from '../screens/ConductorHomeScreen';
-import VehiclesScreen from '../screens/VehiclesScreen';
+import MyVehiclesScreen from '../screens/MyVehiclesScreen';
 import TripsScreen from '../screens/TripsScreen';
 import { logout } from '../utils/authHelper';
+import RegisterVehicleScreen from '../screens/RegisterVehicleScreen';
 
 const Drawer = createDrawerNavigator();
 
@@ -33,8 +34,8 @@ export default function ConductorNavigator({ setUserType }) {
         drawerLabelStyle: { fontSize: 16 },
         drawerIcon: ({ color, size }) => {
           const icons = {
-            'Inicio': 'map-outline',
-            'Mis Vehículos': 'car',
+            'Inicio - Rutas': 'map-outline',
+            'Mis Vehiculos': 'car-sport-outline',
             'Mis Viajes': 'navigate',
           };
           return <Ionicons name={icons[route.name]} size={size} color={color} />;
@@ -42,8 +43,13 @@ export default function ConductorNavigator({ setUserType }) {
       })}
     >
       <Drawer.Screen name="Inicio - Rutas" component={ConductorHomeScreen} />
-      <Drawer.Screen name="Mis Vehículos" component={VehiclesScreen} />
+      <Drawer.Screen name="Mis Vehiculos" component={MyVehiclesScreen} />
       <Drawer.Screen name="Mis Viajes" component={TripsScreen} />
+      <Drawer.Screen
+        name="Registrar Vehiculo"
+        component={RegisterVehicleScreen}
+        options={{ drawerItemStyle: { display: 'none' } }}
+      />
     </Drawer.Navigator>
   );
 }

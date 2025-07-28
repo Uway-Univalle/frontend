@@ -1,5 +1,6 @@
 import MapView, { Marker, Polyline } from 'react-native-maps';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { View, Button, TouchableOpacity, StyleSheet, Modal, Text, Platform, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -94,23 +95,32 @@ export default function ConductorHomeScreen() {
     }
   };
 
-  useEffect(() => {
-    const fetchVehicles = async () => {
-      try {
-        const token = await AsyncStorage.getItem('token');
-        const response = await api.get('/api/vehicles/', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setUserVehicles(response.data); // Ajusta si tu API devuelve los datos en otra propiedad
-      } catch (err) {
-        console.error('Error al cargar vehículos:', err.message);
-      }
-    };
+  useFocusEffect(
+    useCallback(() => {
+      const fetchVehicles = async () => {
+        try {
+          const token = await AsyncStorage.getItem('token');
+          if (!token) {
+            console.warn('Token no encontrado');
+            return;
+          }
 
-    fetchVehicles();
-  }, []);
+          const response = await api.get('/api/vehicles/', {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+
+          const verifiedVehicles = response.data.filter(v => v.is_verified === true);
+          setUserVehicles(verifiedVehicles);
+        } catch (error) {
+          console.error('Error fetching vehicles:', error);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchVehicles();
+    }, [])
+  );
 
   const handleMapTouch = () => {
     setShouldFollow(false); // cuando el usuario toca el mapa, desactiva seguimiento

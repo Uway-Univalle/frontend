@@ -23,3 +23,9 @@ export const VEHICLE_CATEGORIES = {
     CAMPUS: 2,
     INTERMUNICIPAL: 3,
 };
+
+export const VEHICLE_STATE_MAP = {
+    AVAILABLE: { label: 'Disponible', color: 'green' },
+    MAINTENANCE: { label: 'En mantenimiento', color: 'gold' },
+    'IN USE': { label: 'En uso', color: 'blue' }
+};
