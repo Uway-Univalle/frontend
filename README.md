@@ -2,7 +2,7 @@
 ------------------
 
 <p align="center">
-    <img src="./public/Uguee.png" alt="Uway Logo" width="300">
+    <img src="./assets/Uguee.png" alt="Uguee Logo" width="300">
 </p>
 
 📱 Shared Transport Mobile App
